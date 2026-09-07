@@ -1,15 +1,24 @@
-# Growlight — public site (staged, not yet published)
+# Growlight — public site
 
-Landing, privacy and support pages for Growlight's apps, written for issue #121. They are **not
-live anywhere yet**: publishing needs the GitHub org to exist.
+The pages served at <https://growlight.github.io/>: a studio landing page, and privacy and
+support pages for each app. Plain static HTML, one stylesheet, no build step.
 
-These files live under `_docs/` so they don't trigger a TestFlight build
-(`.github/workflows/beta.yml` has `paths-ignore: ['_docs/**', '**/*.md']`). They are staged here
-so the work isn't lost; the intended home is a separate public repository.
+This repo is public so that GitHub Pages serves it for free. The apps themselves are private.
 
-Note `.gitignore` has a blanket `*.html` rule under "Local artifacts". A companion
-`!_docs/site/**/*.html` negation keeps these pages tracked. If you move this directory, move that
-negation with it, or the pages will vanish from commits without any warning.
+## This repo is a submodule of the app it describes
+
+It is vendored into the CouplesBudget project at `external/growlight`, and the pointer on that
+project's `main` records which version of the policy a given app version expects.
+
+That means **editing a file here is not publishing it.** Publishing takes three steps, and it is
+the middle one that gets forgotten:
+
+1. Commit here.
+2. **Push to `growlight/growlight.github.io`.** Until this happens nobody can read the change.
+3. Commit the bumped submodule pointer in CouplesBudget, so `main` pins what is live.
+
+There used to be a second copy of these files under `_docs/site/` in the app repo. It was deleted
+because two copies of a legal document drift — and within a day, they had.
 
 ## Layout
 
@@ -19,7 +28,7 @@ One repo serves every app, each under its own directory:
 growlight.github.io/
 ├── index.html                        → https://growlight.github.io/
 ├── style.css                           shared by every page
-├── .nojekyll
+├── .nojekyll                           serve as-is, no Jekyll
 └── couplesbudget/
     ├── index.html                    → /couplesbudget/
     ├── privacy/index.html            → /couplesbudget/privacy/
@@ -28,28 +37,17 @@ growlight.github.io/
 
 App Store Connect wants a privacy URL, a support URL and an optional marketing URL per app;
 those are the three `couplesbudget/` paths. A second app is a new directory and a card on the
-landing page — no new repo and no Pages setup.
+landing page — no new repo, no Pages setup.
 
 Every link is relative, so nothing depends on the hostname. The site can be served from any
 origin unchanged.
 
-## Publishing
+## Renaming things
 
-1. Create a free org named `growlight` at <https://github.com/organizations/new>.
-2. Inside it, create a **public** repo named exactly `growlight.github.io`.
-3. Copy the *contents* of this directory to that repo's default branch — `index.html` must land
-   at the repo root, not inside a `site/` folder.
-4. Org sites publish from the default branch automatically; check Settings → Pages for the build.
-5. Bump the `Last updated` date in `couplesbudget/privacy/index.html` if publication has
-   slipped well past it.
+Nothing here is locked in, but the privacy URL is compiled into shipped app binaries and handed
+to the App Store, so it has to keep resolving for builds already on people's phones.
 
-## Renaming things later
-
-Nothing here is locked in. The org can be renamed whenever you like — but `growlight.github.io`
-stops resolving the moment you do, with no redirect, and that URL will be compiled into shipped
-builds. Two rules keep that cheap:
-
-**Renaming an app directory:** never delete the old path. Leave a stub at it:
+**Renaming an app directory:** never delete the old path. Leave a stub at it —
 
 ```html
 <meta http-equiv="refresh" content="0; url=/newname/privacy/">
@@ -57,55 +55,46 @@ builds. Two rules keep that cheap:
 <p>This page has moved to <a href="/newname/privacy/">/newname/privacy/</a>.</p>
 ```
 
-Old builds keep working forever, for free.
+Old builds keep working forever, for free. This is the advantage of one repo with directories:
+you own the whole path namespace and can keep any URL alive.
 
-**Renaming the org:** the old name is released rather than destroyed, so claim it back
-immediately — a new free org named `growlight` holding a `growlight.github.io` repo full of
-redirect stubs. Have it ready *before* renaming, so the window where someone else could take the
-name is measured in seconds.
-
-## Drift between the two copies
-
-`.github/workflows/policy-drift.yml` fetches the live pages daily and fails if they do
-not match this directory. It is scheduled rather than a PR check: a PR that edits the
-policy makes live and source differ by definition, and the only way to satisfy a PR check
-would be publishing unreviewed policy text. What it catches is a merged change nobody
-republished. Run it on demand from the Actions tab after publishing.
+**Renaming the org:** `growlight.github.io` stops resolving immediately, with no redirect. The
+old name is released rather than destroyed, so claim it back at once — a new free org named
+`growlight` holding a `growlight.github.io` repo full of redirect stubs. Have it ready *before*
+renaming. A custom domain is the only genuinely rename-proof option.
 
 ## Keeping the policy honest
 
-The root `CLAUDE.md` section "Changes to what we collect are privacy-policy changes"
-describes when a code change obliges you to revisit the policy. This list is the
-checklist it refers to — keep the two in step.
-
-Every factual claim in the privacy policy was verified against the codebase and the live Supabase
-project when written. If any of these change, the policy has to change with it:
+The app repo's `CLAUDE.md` section "Changes to what we collect are privacy-policy changes" says
+when a code change obliges a policy review. This is the checklist it refers to — every claim
+below was verified against the code and the live Supabase project, and each must be rechecked
+when the code moves:
 
 - Data is hosted by Supabase in AWS `us-west-2` (Oregon, USA) — the basis for the PIPEDA
   cross-border disclosure.
 - No analytics, telemetry, crash-reporting or advertising SDKs. `supabase-swift` is the only
-  package the project depends on **directly**; the six transitive pins in `Package.resolved`
-  (Apple's swift-crypto/asn1/http-types, Point-Free's clocks/concurrency-extras/xctest-overlay)
-  are ordinary libraries that collect nothing. CI enforces the direct list — see
-  `.github/workflows/ci.yml`.
+  package the project depends on directly; the transitive pins collect nothing. CI enforces the
+  direct list.
 - Database backups are retained 7 days on the Supabase free tier.
 - Transaction deletion is a hard delete, with no tombstone rows.
+- Account deletion removes the user's transactions, incomes, profile and unreferenced per-person
+  budgets, and reassigns per-person budgets that still hold others' spending.
 - Sign in with Apple requests `.fullName` and `.email`; a Hide My Email user only ever yields a
   relay address.
 - Everything in a household is visible to both members.
 
-Per-app privacy policies are deliberate. Apple expects each app's privacy URL to match that app's
-App Privacy disclosures, and a shared studio-wide policy would either over-disclose for a simple
-app or under-disclose for a complex one. Duplicate the boilerplate between apps instead; a shared
-document drifts out of sync with at least one of them.
+Per-app privacy policies are deliberate. Apple expects each app's privacy URL to match that
+app's App Privacy disclosures, and a shared studio-wide policy would either over-disclose for a
+simple app or under-disclose for a complex one. Duplicate the boilerplate between apps instead;
+a shared document drifts out of sync with at least one of them.
+
+`policy-drift.yml` in the app repo fetches these pages daily and fails when they stop matching
+the pinned submodule commit — catching both a commit that was never pushed here, and a push here
+that `main` never pinned.
 
 ## Known gap
 
-The policy promises access, export and deletion. Export is real — Settings → Export Data (issue
-#120) produces transactions and income as CSV, which is also what satisfies GDPR Art. 20, and the
-policy points at it rather than at an email request.
-
-Deletion is **not currently possible to honour**: `transactions.spender_id`, `incomes.earner_id`
-and `user_profiles.user_id` reference `auth.users` with no `ON DELETE` behaviour, so removing a
-Supabase auth user fails outright. That is issue #119, and it needs to ship before the policy's
-deletion promise is true.
+The policy does not yet describe the free tier (app repo issue #140), which creates no Supabase
+account at all and keeps every row on the device. For those users the claims about signing in
+with Apple, storage in Oregon, cross-border processing, partner visibility and the backup window
+are all wrong — in the over-disclosing direction, but wrong.
