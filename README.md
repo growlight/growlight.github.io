@@ -64,6 +64,14 @@ immediately — a new free org named `growlight` holding a `growlight.github.io`
 redirect stubs. Have it ready *before* renaming, so the window where someone else could take the
 name is measured in seconds.
 
+## Drift between the two copies
+
+`.github/workflows/policy-drift.yml` fetches the live pages daily and fails if they do
+not match this directory. It is scheduled rather than a PR check: a PR that edits the
+policy makes live and source differ by definition, and the only way to satisfy a PR check
+would be publishing unreviewed policy text. What it catches is a merged change nobody
+republished. Run it on demand from the Actions tab after publishing.
+
 ## Keeping the policy honest
 
 The root `CLAUDE.md` section "Changes to what we collect are privacy-policy changes"
