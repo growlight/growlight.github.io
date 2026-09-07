@@ -92,9 +92,14 @@ a shared document drifts out of sync with at least one of them.
 the pinned submodule commit — catching both a commit that was never pushed here, and a push here
 that `main` never pinned.
 
-## Known gap
+## The account-free tier
 
-The policy does not yet describe the free tier (app repo issue #140), which creates no Supabase
-account at all and keeps every row on the device. For those users the claims about signing in
-with Apple, storage in Oregon, cross-border processing, partner visibility and the backup window
-are all wrong — in the over-disclosing direction, but wrong.
+The app runs with no Supabase account at all (app repo issue #140): no sign-in, no sync, every
+row on the device. The policy's "Two ways to use the app" section draws that line, and every
+account-dependent claim after it — our database, cross-border transfer, sharing with the hosting
+provider, backups, partner visibility, account deletion, the California categories — is scoped to
+account holders explicitly.
+
+Keep that scoping intact. If the free tier ever starts sending anything to a server, this is the
+part of the policy that becomes false first, and it is currently the strongest privacy claim on
+the page.
