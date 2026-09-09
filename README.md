@@ -78,11 +78,17 @@ when the code moves:
 - Database backups are retained 7 days on the Supabase free tier.
 - Transaction deletion is a hard delete, with no tombstone rows.
 - Account deletion removes the user's transactions, incomes, profile and unreferenced per-person
-  budgets, and reassigns per-person budgets that still hold others' spending.
+  budgets, and reassigns per-person budgets that still hold others' spending. It also removes
+  their personal budget display order.
 - Sign in with Apple requests `.fullName` and `.email`; a Hide My Email user only ever yields a
   relay address.
 - Everything in a household is visible to both members — including which member bought the paid
   version, which the entitlement table's RLS policy deliberately exposes to the other member.
+- Each member's budget display order is stored per user (`category_sort_orders`, app repo issue
+  #151) and is READABLE household-wide but writable only by its owner. It is the first thing in
+  the schema that differs per member rather than being wholly shared, so the "both members see
+  everything" claim stays true while "both members can change everything" no longer is — the
+  policy says so explicitly in "What your partner can see".
 - Purchase records store an Apple transaction identifier, the product, the purchase time and a
   revocation time. No card number or payment credential is stored, and Apple — not us — processes
   the payment. Adding a payment processor of our own, or storing anything Apple sends beyond the
