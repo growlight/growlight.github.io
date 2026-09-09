@@ -91,6 +91,14 @@ partner, and the display names and roles (owner or partner) of its members.</p>
 <p>The merchant, note and source fields are free text. Whatever you type into them is stored as
 written, so please don’t put anything in there you wouldn’t want your household partner to read.</p>
 
+<h3>Purchases</h3>
+<p>If you buy the paid version, we store a record that the purchase happened: the identifier Apple
+assigns to the transaction, which product was bought, when, and whether it has since been refunded.
+We keep this so the app knows your household has access, and so a refund actually removes it.</p>
+<p>Apple processes the payment, not us. We never receive or store your card number, and the
+transaction identifier is an Apple reference — it is not a payment credential and cannot be used to
+charge you.</p>
+
 <h3>Information about how the app runs</h3>
 <p>The app keeps a copy of your household’s data on your device so it works offline, along with
 timestamps recording when each record was last changed and last synced. These timestamps exist to
@@ -116,6 +124,8 @@ similar), and we do not knowingly collect any such data.</p>
   <strong>every transaction, income record, note, merchant and budget in that household is
   visible to the other member</strong> — including records you created. There is no private or
   hidden spending mode.</p>
+  <p>Your partner can also see that your household has the paid version and which member bought
+  it. They cannot see any payment details, because we do not hold any.</p>
   <p>If you <strong>leave</strong> a household or are removed from it, you lose access to that
   household’s data going forward, but the records you created stay in the household’s history and
   remain visible to the remaining member — they are part of that household’s shared budget rather
@@ -130,6 +140,7 @@ similar), and we do not knowingly collect any such data.</p>
   <tbody>
     <tr><td>Creating your account and signing you in</td><td>Performance of a contract</td></tr>
     <tr><td>Storing and syncing your budget data across your devices and to your partner</td><td>Performance of a contract</td></tr>
+    <tr><td>Recording a purchase, and honouring a refund</td><td>Performance of a contract</td></tr>
     <tr><td>Keeping the service secure and preventing abuse</td><td>Legitimate interests</td></tr>
     <tr><td>Responding to your support, access or deletion requests</td><td>Legal obligation, and performance of a contract</td></tr>
   </tbody>
@@ -146,8 +157,9 @@ never done so, including in the preceding twelve months.</p>
   <li><strong>Supabase</strong> — hosts the database and authentication service that store your
   household’s data. Supabase acts as our processor and runs on Amazon Web Services
   infrastructure.</li>
-  <li><strong>Apple</strong> — provides Sign in with Apple, and distributes the app. Apple’s own
-  handling of your Apple ID is governed by Apple’s privacy policy, not this one.</li>
+  <li><strong>Apple</strong> — provides Sign in with Apple, distributes the app, and processes
+  payment for the paid version. Apple’s own handling of your Apple ID and of your payment is
+  governed by Apple’s privacy policy, not this one.</li>
 </ul>
 <p>We may also disclose information if we are legally required to — for example, in response to a
 valid court order — or where necessary to protect someone’s safety or our legal rights.</p>
@@ -175,6 +187,7 @@ serves the purpose it was collected for. In practice:</p>
     <tr><td>Your account and household data</td><td>For as long as your account exists. There is no automatic expiry while you are an active user — the app’s purpose is to keep a running budget history.</td></tr>
     <tr><td>Deleted transactions and other records</td><td>Removed outright when you delete them, after a brief in-app undo window. We do not keep hidden copies of deleted rows.</td></tr>
     <tr><td>Your account after a deletion request</td><td>Erased from live systems as described below.</td></tr>
+    <tr><td>Purchase records</td><td>Kept while your account exists, and after a refund, as the record that the purchase and the refund happened. We may keep it longer where tax or accounting rules require.</td></tr>
     <tr><td>Encrypted database backups</td><td>Up to 7 days, after which they are overwritten on a rolling basis. Deleted data may persist in a backup for that window and is not restored or used for any other purpose.</td></tr>
     <tr><td>The copy on your device</td><td>Removed when you delete the app. If your iPhone backs up to iCloud or a computer, that backup may contain a copy under your control and Apple’s terms, not ours.</td></tr>
   </tbody>
@@ -216,6 +229,11 @@ telling you why. There is no charge for a reasonable request.</p>
 <p>What stays is your household’s shared material: shared budgets, tags, and the transactions and
 income recorded by the other member — that is their data, not yours. If you were the last member,
 the household goes too.</p>
+<p>One other record stays: if you bought the paid version, the purchase record described above
+survives deletion. It is the evidence that a purchase happened, which we may need for refunds,
+disputes and accounting, and Apple can still tell us about a refund for it after the account is
+gone. It holds an Apple transaction reference and no payment details. Ask us and we will delete it
+too, where we are not required to keep it.</p>
 <p>Your spending history is genuinely removed rather than anonymised, which means your household’s
 historical totals drop by whatever you had recorded. That is a deliberate choice: “deleted” should
 mean deleted.</p>

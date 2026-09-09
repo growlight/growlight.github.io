@@ -81,7 +81,17 @@ when the code moves:
   budgets, and reassigns per-person budgets that still hold others' spending.
 - Sign in with Apple requests `.fullName` and `.email`; a Hide My Email user only ever yields a
   relay address.
-- Everything in a household is visible to both members.
+- Everything in a household is visible to both members — including which member bought the paid
+  version, which the entitlement table's RLS policy deliberately exposes to the other member.
+- Purchase records store an Apple transaction identifier, the product, the purchase time and a
+  revocation time. No card number or payment credential is stored, and Apple — not us — processes
+  the payment. Adding a payment processor of our own, or storing anything Apple sends beyond the
+  transaction reference, changes this.
+- Purchase records SURVIVE account deletion. `user_entitlements` has no FK to `auth.users` and
+  `delete_own_account` does not touch it, deliberately: a refund can arrive after the account is
+  gone. This is the one exception to the policy's "deletion is real" promise and it is disclosed
+  in "What deletion actually does" — if the deletion function is ever changed to remove these
+  rows, that paragraph must go with it.
 
 Per-app privacy policies are deliberate. Apple expects each app's privacy URL to match that
 app's App Privacy disclosures, and a shared studio-wide policy would either over-disclose for a
