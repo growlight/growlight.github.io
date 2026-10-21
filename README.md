@@ -75,6 +75,11 @@ when the code moves:
 - No analytics, telemetry, crash-reporting or advertising SDKs. `supabase-swift` is the only
   package the project depends on directly; the transitive pins collect nothing. CI enforces the
   direct list.
+- The operator (the developer) has administrative dashboard access to the database and can read
+  account holders' data in plain text; it is NOT end-to-end encrypted. The policy says so in "How
+  we protect your information" and lists "diagnosing and fixing problems" as a legitimate-interests
+  purpose. Only add claims about how that access is limited (MFA, no copies outside the database)
+  once they are actually practised.
 - Database backups are retained 7 days on the Supabase free tier.
 - Transaction deletion is a hard delete, with no tombstone rows.
 - Account deletion removes the user's transactions, incomes, profile and unreferenced per-person
