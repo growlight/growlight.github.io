@@ -94,6 +94,13 @@ when the code moves:
   the schema that differs per member rather than being wholly shared, so the "both members see
   everything" claim stays true while "both members can change everything" no longer is — the
   policy says so explicitly in "What your partner can see".
+- Past budget amounts are stored (`category_budget_history`, app repo issue #271) when a member
+  changes an amount "starting this month/year": one row per change, holding the amount the
+  earlier months had. Household-scoped like the category itself, and cascades with it — deleting
+  a category, a per-person budget on account deletion, or a whole household removes its history.
+  "All months" rewrites those rows to the new amount rather than keeping the old one anywhere.
+  The "Budget categories" row of the stored-records table says so; a change to what is kept, or
+  any per-member visibility, changes that row.
 - Purchase records store an Apple transaction identifier, the product, the purchase time and a
   revocation time. No card number or payment credential is stored, and Apple — not us — processes
   the payment. Adding a payment processor of our own, or storing anything Apple sends beyond the
